@@ -38,11 +38,11 @@ terraform apply
 
 # Networking and associated costs
 
-This project is intended to be as close as possible as a "real" deployment, consequently, the Jitsi services are deployed in private subnets without a NAT gateway.
+This project is intended to be as close as possible as a "real" deployment, consequently, when `deploy_in_private_subnets` parameter is `true`, Jitsi services are deployed in private subnets without a NAT gateway. In this particular configuration, additional VPC endpoints are deployed over two availability zone each. **This incur additional costs estimated to 60 USD per month** (4 VPC endpoints x 2 ENIs per VPC endpoint x 730 hours in a month x 0,01 USD = 58,40 USD).
 
-To make everything work, in particular, the Fargate image pulling, VPC endpoints are configured in the [vpc.tf](vpc.tf) file and deployed over two availability zone each. **This incur additional costs estimated to 60 USD per month** (4 VPC endpoints x 2 ENIs per VPC endpoint x 730 hours in a month x 0,01 USD = 58,40 USD).
+If you just want to try Jitsi without additional networking costs, keep the parameter `deploy_in_private_subnets` to false (it is the default).
 
-In a real-world design, these costs would be mutualized over your projects, switched to NAT costs using a NAT gateway, or completely removed by putting everything into public subnets with public ips.
+**Regardless of the `deploy_in_private_subnets` parameter configuration, you will pay the AWS Fargate containers while Jitsi tasks are running. Do not let this infrastructure run without actually using it, or it will impact your AWS bill.**
 
 # Limitation
 
@@ -54,9 +54,7 @@ This is a demo Terraform stack. Consequently, it has the following limitations:
 
 # Docker Hub mirror
 
-This project creates ECR registries to provide DockerHub mirrors inside AWS. You may, or may not use it, however, pulling DockerHub would require a NAT gateway or public IPs configured over ECS tasks (see [vpc.tf](vpc.tf))
-
-If you use the private ECR registries, you must init registries with images pulled from DockerHub like below.
+This project creates ECR registries to provide DockerHub mirrors inside AWS. You may, or may not use it. If you use the private ECR registries, you must init registries with images pulled from DockerHub like below.
 
 ```shell
 AWS_ACCOUNT_ID=...
@@ -78,3 +76,5 @@ docker pull jitsi/web:web-1.0.8310-1
 docker tag jitsi/web:web-1.0.8310-1 ${AWS_REGISTRY}/jitsi/web:web-1.0.8310-1
 docker push ${AWS_REGISTRY}/jitsi/web:web-1.0.8310-1
 ```
+
+Note that using these registries is required if you have choosen to flip `deploy_in_private_subnets` to `true`, because no NAT gateway are deployed by the project. You may adapt this project and deploy a NAT gateway if relevant. I choosed not to do it by default to keep default costs low.

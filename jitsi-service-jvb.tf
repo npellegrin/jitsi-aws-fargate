@@ -39,11 +39,9 @@ resource "aws_ecs_service" "jitsi_jvb" {
   }
 
   network_configuration {
-    subnets         = module.vpc.private_subnets
-    security_groups = [aws_security_group.jitsi_jvb.id]
-
-    # FIXME: Maybe required for STUN server (Google ones) ? See JVB_ADVERTISE_IPS ?
-    assign_public_ip = false
+    security_groups  = [aws_security_group.jitsi_jvb.id]
+    subnets          = var.deploy_in_private_subnets ? module.vpc.private_subnets : module.vpc.public_subnets
+    assign_public_ip = !var.deploy_in_private_subnets
   }
 
   capacity_provider_strategy {

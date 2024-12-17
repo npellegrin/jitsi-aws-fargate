@@ -27,11 +27,9 @@ resource "aws_ecs_service" "jitsi_jicofo" {
   deployment_maximum_percent         = 200
 
   network_configuration {
-    subnets         = module.vpc.private_subnets
-    security_groups = [aws_security_group.jitsi_jicofo.id]
-
-    # Public IP not required - Jicofo do not require Internet access
-    assign_public_ip = false
+    security_groups  = [aws_security_group.jitsi_jicofo.id]
+    subnets          = var.deploy_in_private_subnets ? module.vpc.private_subnets : module.vpc.public_subnets
+    assign_public_ip = !var.deploy_in_private_subnets
   }
 
   capacity_provider_strategy {

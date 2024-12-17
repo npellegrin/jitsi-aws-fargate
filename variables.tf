@@ -1,12 +1,3 @@
-variable "aws_region" {
-  type        = string
-  description = "AWS region to use"
-}
-
-variable "aws_availability_zones" {
-  type        = list(string)
-  description = "AWS Availability zones to use"
-}
 
 variable "allowed_account_ids" {
   type        = list(string)
@@ -39,4 +30,34 @@ variable "jitsi_images" {
     prosody = "jitsi/prosody",
     web     = "jitsi/web",
   }
+}
+
+variable "aws_region" {
+  type        = string
+  description = "AWS region to use"
+  default     = "eu-west-1"
+}
+
+variable "aws_availability_zones" {
+  type        = list(string)
+  description = "AWS Availability zones to use"
+  default     = ["eu-west-1a", "eu-west-1b"]
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block of VPC."
+  default     = "10.0.0.0/16"
+}
+variable "vpc_private_subnets" {
+  description = "CIDR block of VPC private subnets."
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+}
+variable "vpc_public_subnets" {
+  description = "CIDR block of VPC public subnets."
+  default     = ["10.0.101.0/24", "10.0.102.0/24"]
+}
+
+variable "deploy_in_private_subnets" {
+  description = "When TRUE, will deploy Jitsi services in a private network, without public IPs. Additional costs for VPC endpoints are expected with a private network setup."
+  default     = false
 }

@@ -34,11 +34,9 @@ resource "aws_ecs_service" "jitsi_web" {
   }
 
   network_configuration {
-    subnets         = module.vpc.private_subnets
-    security_groups = [aws_security_group.jitsi_web.id]
-
-    # Public IP not required - we will not use letsencrypt
-    assign_public_ip = false
+    security_groups  = [aws_security_group.jitsi_web.id]
+    subnets          = var.deploy_in_private_subnets ? module.vpc.private_subnets : module.vpc.public_subnets
+    assign_public_ip = !var.deploy_in_private_subnets
   }
 
   capacity_provider_strategy {
