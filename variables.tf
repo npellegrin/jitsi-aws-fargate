@@ -24,17 +24,19 @@ variable "hosted_zone_id" {
 }
 
 variable "jitsi_images" {
+  description = "References to Jisti components Docker images. If you use the private registries deployed in this demo, the images must be prefixed by <AWS account id>.dkr.ecr.eu-west-1.amazonaws.com/jitsi-meet-mirror/"
+
   type = object({
-    web     = string
-    jvb     = string
     jicofo  = string
+    jvb     = string
     prosody = string
+    web     = string
   })
 
   default = {
-    web     = "jitsi/web",
-    jvb     = "jitsi/jvb",
     jicofo  = "jitsi/jicofo",
+    jvb     = "jitsi/jvb",
     prosody = "jitsi/prosody",
+    web     = "jitsi/web",
   }
 }

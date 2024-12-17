@@ -44,7 +44,8 @@ resource "aws_iam_policy" "task_exe" {
           "kms:Describe*"
         ],
         Resource = [
-          aws_kms_key.cluster.arn
+          aws_kms_key.cluster.arn,
+          aws_kms_key.registry.arn
         ]
       }
     ]
