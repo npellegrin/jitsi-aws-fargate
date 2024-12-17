@@ -39,11 +39,9 @@ resource "aws_ecs_service" "jitsi_jvb" {
   }
 
   network_configuration {
-    # ECS service on public subnet because no NAT gateway available (cost optimization)
-    subnets         = module.vpc.public_subnets
+    subnets         = module.vpc.private_subnets
     security_groups = [aws_security_group.jitsi_jvb.id]
 
-    # Public IP disabled - no Internet access required
     # FIXME: Maybe required for STUN server (Google ones) ? See JVB_ADVERTISE_IPS ?
     assign_public_ip = false
   }

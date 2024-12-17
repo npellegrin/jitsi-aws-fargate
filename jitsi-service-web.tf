@@ -34,8 +34,7 @@ resource "aws_ecs_service" "jitsi_web" {
   }
 
   network_configuration {
-    # ECS service on public subnet because no NAT gateway available (cost optimization)
-    subnets         = module.vpc.public_subnets
+    subnets         = module.vpc.private_subnets
     security_groups = [aws_security_group.jitsi_web.id]
 
     # Public IP not required - we will not use letsencrypt

@@ -34,9 +34,9 @@ resource "aws_vpc_endpoint" "ssm" {
   security_group_ids  = [aws_security_group.endpoints.id]
 }
 resource "aws_vpc_endpoint_subnet_association" "ssm" {
-  for_each        = toset(module.vpc.private_subnets)
+  count           = length(module.vpc.private_subnets)
   vpc_endpoint_id = aws_vpc_endpoint.ssm.id
-  subnet_id       = each.key
+  subnet_id       = module.vpc.private_subnets[count.index]
 }
 
 # Required CloudWatch endpoint for logging in private subnets. This incur additional costs.
@@ -48,9 +48,9 @@ resource "aws_vpc_endpoint" "logs" {
   security_group_ids  = [aws_security_group.endpoints.id]
 }
 resource "aws_vpc_endpoint_subnet_association" "logs" {
-  for_each        = toset(module.vpc.private_subnets)
+  count           = length(module.vpc.private_subnets)
   vpc_endpoint_id = aws_vpc_endpoint.logs.id
-  subnet_id       = each.key
+  subnet_id       = module.vpc.private_subnets[count.index]
 }
 
 # Required ECR endpoint for private registries. This incur additional costs.
@@ -62,9 +62,9 @@ resource "aws_vpc_endpoint" "ecr_api" {
   security_group_ids  = [aws_security_group.endpoints.id]
 }
 resource "aws_vpc_endpoint_subnet_association" "ecr_api" {
-  for_each        = toset(module.vpc.private_subnets)
+  count           = length(module.vpc.private_subnets)
   vpc_endpoint_id = aws_vpc_endpoint.ecr_api.id
-  subnet_id       = each.key
+  subnet_id       = module.vpc.private_subnets[count.index]
 }
 resource "aws_vpc_endpoint" "ecr_dkr" {
   vpc_id              = module.vpc.vpc_id
@@ -74,9 +74,9 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
   security_group_ids  = [aws_security_group.endpoints.id]
 }
 resource "aws_vpc_endpoint_subnet_association" "ecr_dkr" {
-  for_each        = toset(module.vpc.private_subnets)
+  count           = length(module.vpc.private_subnets)
   vpc_endpoint_id = aws_vpc_endpoint.ecr_dkr.id
-  subnet_id       = each.key
+  subnet_id       = module.vpc.private_subnets[count.index]
 }
 
 # Required S3 endpoint for pulling data from registries.
@@ -84,7 +84,10 @@ resource "aws_vpc_endpoint" "s3" {
   vpc_id            = module.vpc.vpc_id
   service_name      = "com.amazonaws.eu-west-1.s3"
   vpc_endpoint_type = "Gateway"
-  route_table_ids   = module.vpc.private_route_table_ids
+  route_table_ids   = concat(
+    module.vpc.private_route_table_ids,
+    module.vpc.public_route_table_ids
+  )
 }
 
 # Endpoint security group - wide open to all VPC ips

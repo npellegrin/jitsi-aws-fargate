@@ -27,8 +27,7 @@ resource "aws_ecs_service" "jitsi_jicofo" {
   deployment_maximum_percent         = 200
 
   network_configuration {
-    # ECS service on public subnet because no NAT gateway available (cost optimization)
-    subnets         = module.vpc.public_subnets
+    subnets         = module.vpc.private_subnets
     security_groups = [aws_security_group.jitsi_jicofo.id]
 
     # Public IP not required - Jicofo do not require Internet access
